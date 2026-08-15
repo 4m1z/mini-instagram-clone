@@ -60,8 +60,7 @@ func (h *ImageHandler) Tags(c *gin.Context) {
 // POST /api/uploads (multipart/form-data).
 func (h *ImageHandler) Upload(c *gin.Context) {
 	if c.ContentType() != "multipart/form-data" {
-		writeError(c, http.StatusUnsupportedMediaType, codeUnsupported,
-			"Expected a multipart/form-data request.", nil)
+		c.JSON(http.StatusUnsupportedMediaType, errorResponse{Error: errorBody{Code: codeUnsupported, Message: "Expected a multipart/form-data request.", Fields: nil}})
 		return
 	}
 
@@ -71,7 +70,7 @@ func (h *ImageHandler) Upload(c *gin.Context) {
 			writeServiceError(c, h.log, service.ErrFileTooLarge)
 			return
 		}
-		writeError(c, http.StatusBadRequest, codeBadRequest, "The upload could not be read.", nil)
+		c.JSON(http.StatusBadRequest, errorResponse{Error: errorBody{Code: codeBadRequest, Message: "The upload could not be read.", Fields: nil}})
 		return
 	}
 	defer form.RemoveAll()
@@ -82,15 +81,14 @@ func (h *ImageHandler) Upload(c *gin.Context) {
 	}
 	files := form.File["image"]
 	if len(files) > 1 {
-		writeError(c, http.StatusUnprocessableEntity, codeValidation,
-			"The submitted data is invalid.", map[string]string{"image": "only one image may be uploaded"})
+		c.JSON(http.StatusUnprocessableEntity, errorResponse{Error: errorBody{Code: codeValidation, Message: "The submitted data is invalid.", Fields: map[string]string{"image": "only one image may be uploaded"}}})
 		return
 	}
 
 	if len(files) == 1 {
 		file, err := files[0].Open()
 		if err != nil {
-			writeError(c, http.StatusBadRequest, codeBadRequest, "The image could not be read.", nil)
+			c.JSON(http.StatusBadRequest, errorResponse{Error: errorBody{Code: codeBadRequest, Message: "The image could not be read.", Fields: nil}})
 			return
 		}
 		defer file.Close()

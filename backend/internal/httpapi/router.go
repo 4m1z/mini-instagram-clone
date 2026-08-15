@@ -38,7 +38,7 @@ func NewRouter(d RouterDeps) http.Handler {
 	files := http.StripPrefix(filesPath, http.FileServer(http.Dir(d.FilesDir)))
 	serveFile := func(c *gin.Context) {
 		if c.Param("filepath") == "/" {
-			writeError(c, http.StatusNotFound, codeNotFound, "The requested resource was not found.", nil)
+			c.JSON(http.StatusNotFound, errorResponse{Error: errorBody{Code: codeNotFound, Message: "The requested resource was not found.", Fields: nil}})
 			return
 		}
 		files.ServeHTTP(c.Writer, c.Request)
@@ -47,10 +47,10 @@ func NewRouter(d RouterDeps) http.Handler {
 	router.HEAD(filesPath+"/*filepath", serveFile)
 
 	router.NoRoute(func(c *gin.Context) {
-		writeError(c, http.StatusNotFound, codeNotFound, "The requested resource was not found.", nil)
+		c.JSON(http.StatusNotFound, errorResponse{Error: errorBody{Code: codeNotFound, Message: "The requested resource was not found.", Fields: nil}})
 	})
 	router.NoMethod(func(c *gin.Context) {
-		writeError(c, http.StatusMethodNotAllowed, codeBadRequest, "The request method is not allowed.", nil)
+		c.JSON(http.StatusMethodNotAllowed, errorResponse{Error: errorBody{Code: codeBadRequest, Message: "The request method is not allowed.", Fields: nil}})
 	})
 
 	// Gin's multipart setting controls memory usage, not total request size.
@@ -87,7 +87,6 @@ func requestLogger(log *slog.Logger) gin.HandlerFunc {
 func recoverPanics(log *slog.Logger) gin.HandlerFunc {
 	return gin.CustomRecoveryWithWriter(io.Discard, func(c *gin.Context, recovered any) {
 		log.Error("panic recovered", "path", c.Request.URL.Path, "panic", recovered)
-		writeError(c, http.StatusInternalServerError, codeInternal,
-			"Something went wrong. Please try again.", nil)
+		c.JSON(http.StatusInternalServerError, errorResponse{Error: errorBody{Code: codeInternal, Message: "Something went wrong. Please try again.", Fields: nil}})
 	})
 }

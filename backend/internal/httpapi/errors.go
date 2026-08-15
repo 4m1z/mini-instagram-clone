@@ -29,10 +29,6 @@ type errorResponse struct {
 	Error errorBody `json:"error"`
 }
 
-func writeError(c *gin.Context, status int, code, message string, fields map[string]string) {
-	c.JSON(status, errorResponse{Error: errorBody{Code: code, Message: message, Fields: fields}})
-}
-
 func writeServiceError(c *gin.Context, log *slog.Logger, err error) {
 	var validation *domain.ValidationError
 	switch {
@@ -43,13 +39,13 @@ func writeServiceError(c *gin.Context, log *slog.Logger, err error) {
 				fields[f.Field] = f.Message
 			}
 		}
-		writeError(c, http.StatusUnprocessableEntity, codeValidation, "The submitted data is invalid.", fields)
+		c.JSON(http.StatusUnprocessableEntity, errorResponse{Error: errorBody{Code: codeValidation, Message: "The submitted data is invalid.", Fields: fields}})
 	case errors.Is(err, service.ErrFileTooLarge):
-		writeError(c, http.StatusRequestEntityTooLarge, codeTooLarge, "The image is too large (maximum 10 MB).", nil)
+		c.JSON(http.StatusRequestEntityTooLarge, errorResponse{Error: errorBody{Code: codeTooLarge, Message: "The image is too large (maximum 10 MB).", Fields: nil}})
 	case errors.Is(err, domain.ErrNotFound):
-		writeError(c, http.StatusNotFound, codeNotFound, "The requested resource was not found.", nil)
+		c.JSON(http.StatusNotFound, errorResponse{Error: errorBody{Code: codeNotFound, Message: "The requested resource was not found.", Fields: nil}})
 	default:
 		log.Error("unhandled request error", "error", err)
-		writeError(c, http.StatusInternalServerError, codeInternal, "Something went wrong. Please try again.", nil)
+		c.JSON(http.StatusInternalServerError, errorResponse{Error: errorBody{Code: codeInternal, Message: "Something went wrong. Please try again.", Fields: nil}})
 	}
 }
