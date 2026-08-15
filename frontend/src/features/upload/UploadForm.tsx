@@ -1,17 +1,27 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button, Input } from "../../components";
+import { addImageToCache } from "../feed";
 import { Field } from "./Field";
 import { UploadStatus } from "./UploadStatus";
 import {
   ACCEPTED_MIME_TYPES,
+  createUploadAction,
   initialUploadState,
-  uploadAction,
   type UploadState,
 } from "./uploadAction";
 
-export function UploadForm() {
-  const [state, action] = useActionState<UploadState, FormData>(uploadAction, initialUploadState);
+type Props = {
+  onViewFeed: () => void;
+};
+
+export function UploadForm({ onViewFeed }: Props) {
+  const queryClient = useQueryClient();
+  const [state, action] = useActionState<UploadState, FormData>(
+    createUploadAction((image) => addImageToCache(queryClient, image)),
+    initialUploadState,
+  );
 
   const fields = state.status === "error" ? state.fields : {};
   const values = state.status === "error" ? state.values : { title: "", tag: "" };
@@ -71,7 +81,7 @@ export function UploadForm() {
       </Field>
 
       <SubmitButton />
-      <UploadStatus state={state} />
+      <UploadStatus state={state} onViewFeed={onViewFeed} />
     </form>
   );
 }

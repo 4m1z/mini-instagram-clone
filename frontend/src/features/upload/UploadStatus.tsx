@@ -1,16 +1,25 @@
+import { Button } from "../../components";
 import type { UploadState } from "./uploadAction";
 
 type Props = {
   state: UploadState;
+  onViewFeed: () => void;
 };
 
-export function UploadStatus({ state }: Props) {
+export function UploadStatus({ state, onViewFeed }: Props) {
   if (state.status === "error") {
     return <Alert> {state.message} </Alert>;
   }
 
   if (state.status === "success") {
-    return <Success>“{state.title}” was uploaded.</Success>;
+    return (
+      <Success>
+        <span>“{state.title}” was uploaded.</span>
+        <Button onClick={onViewFeed} className="font-medium underline">
+          View in feed
+        </Button>
+      </Success>
+    );
   }
 
   return null;
