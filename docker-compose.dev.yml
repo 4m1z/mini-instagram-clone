@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    environment:
+      APP_ADDR: ":8080"
+      APP_DB_PATH: /data/app.db
+      APP_UPLOADS_DIR: /data/uploads
+    volumes:
+      - ./backend:/app
+      - ./backend/data:/data
+      - go-build-cache:/root/.cache/go-build
+      - go-mod-cache:/go/pkg/mod
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      # Vite proxies /api and /files to the backend container.
+      BACKEND_URL: http://backend:8080
+      VITE_USE_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  go-build-cache:
+  go-mod-cache:
+  frontend-node-modules:
