@@ -1,0 +1,15 @@
+# Development image: compiles and restarts the server on file changes.
+FROM golang:1.25-alpine
+
+RUN apk add --no-cache git && go install github.com/air-verse/air@v1.63.0
+
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+
+ENV APP_ADDR=:8080 \
+    APP_DB_PATH=/data/app.db \
+    APP_UPLOADS_DIR=/data/uploads
+
+EXPOSE 8080
+CMD ["air", "-c", ".air.toml"]
