@@ -1,0 +1,10 @@
+FROM oven/bun:1.2-alpine
+WORKDIR /app
+
+COPY package.json bun.lock* ./
+RUN bun install --frozen-lockfile
+
+EXPOSE 3000
+# The named node_modules volume survives image rebuilds. Reconcile it with the
+# bind-mounted lockfile before Vite starts so dependency changes are picked up.
+CMD ["sh", "-c", "bun install --frozen-lockfile && exec bun run dev"]
