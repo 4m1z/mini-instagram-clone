@@ -1,6 +1,9 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { fetchImages, fetchTags } from "../../api/images";
+import { subscribeToImages, subscribeToReconnect } from "../../lib/imageStream";
 import type { FeedImage } from "../../types/image";
+import { addImageToCache } from "./feedCache";
 import { imageKeys } from "./queryKeys";
 
 /** The feed for the currently selected tag (`null` means "all tags"). */
@@ -19,4 +22,21 @@ export function useTags(): string[] {
     queryFn: ({ signal }) => fetchTags(signal),
   });
   return data;
+}
+
+export function useLiveFeed(): void {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const unsubscribeImages = subscribeToImages((image) => addImageToCache(queryClient, image));
+    const unsubscribeReconnect = subscribeToReconnect(() => {
+      void queryClient.invalidateQueries({ queryKey: imageKeys.lists });
+      void queryClient.invalidateQueries({ queryKey: imageKeys.tags });
+    });
+
+    return () => {
+      unsubscribeReconnect();
+      unsubscribeImages();
+    };
+  }, [queryClient]);
 }

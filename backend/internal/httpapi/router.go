@@ -12,6 +12,7 @@ import (
 
 type RouterDeps struct {
 	Images    *ImageHandler
+	WS        http.Handler
 	FilesDir  string
 	FilesPath string // e.g. "/files/"
 	Log       *slog.Logger
@@ -31,6 +32,7 @@ func NewRouter(d RouterDeps) http.Handler {
 	api.GET("/images", d.Images.List)
 	api.GET("/tags", d.Images.Tags)
 	api.POST("/uploads", d.Images.Upload)
+	api.GET("/ws", gin.WrapH(d.WS))
 
 	filesPath := strings.TrimSuffix(d.FilesPath, "/")
 	files := http.StripPrefix(filesPath, http.FileServer(http.Dir(d.FilesDir)))

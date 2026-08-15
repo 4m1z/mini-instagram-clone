@@ -15,6 +15,7 @@ import (
 	"github.com/4m1z/mini-instagram-clone/backend/internal/repository"
 	"github.com/4m1z/mini-instagram-clone/backend/internal/service"
 	"github.com/4m1z/mini-instagram-clone/backend/internal/storage"
+	"github.com/4m1z/mini-instagram-clone/backend/internal/websocket"
 )
 
 func main() {
@@ -41,15 +42,17 @@ func run(log *slog.Logger) error {
 		return err
 	}
 
+	hub := websocket.NewHub(log)
 	mapper := httpapi.NewImageMapper(cfg.FilesPath)
 	images := service.NewImageService(
 		repository.NewImageRepository(db),
 		files,
-		nil,
+		httpapi.NewImageEventPublisher(hub, mapper),
 	)
 
 	router := httpapi.NewRouter(httpapi.RouterDeps{
 		Images:    httpapi.NewImageHandler(images, mapper, log),
+		WS:        websocket.NewHandler(hub, log),
 		FilesDir:  files.Dir(),
 		FilesPath: cfg.FilesPath,
 		Log:       log,
@@ -60,7 +63,7 @@ func run(log *slog.Logger) error {
 		Handler:           router,
 		ReadHeaderTimeout: 10 * time.Second,
 		ReadTimeout:       60 * time.Second,
-		WriteTimeout:      60 * time.Second,
+		WriteTimeout:      0, // WebSocket connections are long lived.
 		IdleTimeout:       120 * time.Second,
 	}
 
