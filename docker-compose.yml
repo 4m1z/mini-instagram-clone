@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      APP_ADDR: ":8080"
+      APP_DB_PATH: /data/app.db
+      APP_UPLOADS_DIR: /data/uploads
+    volumes:
+      - backend-data:/data
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "8000:80"
+    restart: unless-stopped
+
+volumes:
+  backend-data:

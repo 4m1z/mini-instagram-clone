@@ -1,4 +1,3 @@
-// Package repository contains the SQLite metadata persistence layer.
 package repository
 
 import (
@@ -7,21 +6,21 @@ import (
 	"os"
 	"path/filepath"
 
-	_ "modernc.org/sqlite" // pure Go driver, no cgo needed
+	_ "modernc.org/sqlite"
 )
 
 const schema = `
-CREATE TABLE IF NOT EXISTS images (
-	id          TEXT    PRIMARY KEY,
-	title       TEXT    NOT NULL,
-	tag         TEXT    NOT NULL,
-	filename    TEXT    NOT NULL,
-	mime_type   TEXT    NOT NULL,
-	size_bytes  INTEGER NOT NULL,
-	created_at  TEXT    NOT NULL
-);
-CREATE INDEX IF NOT EXISTS idx_images_tag_created_at ON images (tag, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_images_created_at ON images (created_at DESC);
+	CREATE TABLE IF NOT EXISTS images (
+		id          TEXT    PRIMARY KEY,
+		title       TEXT    NOT NULL,
+		tag         TEXT    NOT NULL,
+		filename    TEXT    NOT NULL,
+		mime_type   TEXT    NOT NULL,
+		size_bytes  INTEGER NOT NULL,
+		created_at  TEXT    NOT NULL
+	);
+	CREATE INDEX IF NOT EXISTS idx_images_tag_created_at ON images (tag, created_at DESC);
+	CREATE INDEX IF NOT EXISTS idx_images_created_at ON images (created_at DESC);
 `
 
 // Open opens (and migrates) the SQLite database at path.
