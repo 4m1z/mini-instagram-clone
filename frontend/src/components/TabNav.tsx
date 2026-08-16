@@ -17,14 +17,19 @@ const tabs: ReadonlyArray<{ id: Tab; label: string }> = [
 // Two-view navigation stays in the URL without requiring a router.
 export function TabNav({ active, onChange }: Props) {
   return (
-    <nav className="flex gap-1 rounded-lg bg-slate-100 p-1" aria-label="Views">
+    <nav
+      className="sticky top-3 z-10 flex gap-1 rounded-2xl border border-white/80 bg-white/70 p-1.5 shadow-sm backdrop-blur-xl"
+      aria-label="Views"
+    >
       {tabs.map((tab) => (
         <Button
           key={tab.id}
           onClick={() => onChange(tab.id)}
           aria-current={active === tab.id ? "page" : undefined}
-          className={`flex-1 rounded-md px-4 py-2 text-sm font-medium ${
-            active === tab.id ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"
+          className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold ${
+            active === tab.id
+              ? "bg-slate-950 text-white shadow-sm"
+              : "text-slate-500 hover:bg-white/70 hover:text-slate-900"
           }`}
         >
           {tab.label}

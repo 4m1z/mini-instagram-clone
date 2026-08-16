@@ -12,7 +12,7 @@ export function FeedError({ error, resetErrorBoundary }: FallbackProps) {
   };
 
   return (
-    <div role="alert" className="flex flex-col items-start gap-3 rounded-xl bg-red-50 p-6">
+    <div role="alert" className="flex w-full flex-col items-start gap-3 rounded-2xl border border-red-100 bg-red-50 p-6">
       <p className="text-sm text-red-700">{message}</p>
       <Button variant="danger" onClick={retry}>
         Try again

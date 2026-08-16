@@ -5,5 +5,22 @@ html {
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply min-w-80 bg-slate-50 text-slate-900 antialiased;
+  background-image:
+    radial-gradient(circle at 8% 0%, rgb(244 232 255 / 55%), transparent 24rem),
+    radial-gradient(circle at 92% 8%, rgb(255 237 213 / 45%), transparent 22rem);
+  background-attachment: fixed;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

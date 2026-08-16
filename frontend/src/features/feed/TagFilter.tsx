@@ -12,7 +12,11 @@ export function TagFilter({ tags, activeTag, onChange }: Props) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by tag">
+    <div
+      className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+      role="group"
+      aria-label="Filter by tag"
+    >
       <FilterChip active={activeTag === null} onClick={() => onChange(null)}>
         All
       </FilterChip>
@@ -36,10 +40,10 @@ function FilterChip({ active, onClick, children }: ChipProps) {
     <Button
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-full border px-3 py-1.5 text-sm ${
+      className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium shadow-sm ${
         active
-          ? "border-slate-900 bg-slate-900 text-white"
-          : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
+          ? "border-slate-950 bg-slate-950 text-white"
+          : "border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-950"
       }`}
     >
       {children}

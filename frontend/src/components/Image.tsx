@@ -9,7 +9,7 @@ export function Image({ url, title }: Props) {
       src={url}
       alt={title}
       loading="lazy"
-      className="aspect-square w-full bg-slate-100 object-cover"
+      className="aspect-square w-full bg-slate-100 object-cover transition duration-500 group-hover:scale-[1.025]"
     />
   );
 }

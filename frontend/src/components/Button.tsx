@@ -6,14 +6,14 @@ type Props = ComponentProps<"button"> & {
   variant?: ButtonVariant;
 };
 
-const baseClassName = `inline-flex items-center justify-center transition 
+const baseClassName = `inline-flex items-center justify-center transition-all
   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 
-  focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60`;
+  focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100`;
 
 const variantClassNames: Record<ButtonVariant, string> = {
   plain: "",
-  primary: "rounded-lg bg-slate-900 px-4 py-2.5 font-medium text-white hover:bg-slate-700",
-  danger: "rounded-lg bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700",
+  primary: "rounded-xl bg-slate-950 px-4 py-3 font-semibold text-white shadow-sm hover:bg-slate-800",
+  danger: "rounded-xl bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700",
 };
 
 export function Button({ variant = "plain", type = "button", className, ...props }: Props) {

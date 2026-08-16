@@ -29,7 +29,7 @@ function Alert({ children }: { children: React.ReactNode }) {
   return (
     <p
       role="alert"
-      className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
+      className="rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700"
     >
       {children}
     </p>
@@ -40,7 +40,7 @@ function Success({ children }: { children: React.ReactNode }) {
   return (
     <div
       role="status"
-      className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
+      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
     > {children}
     </div>
   );

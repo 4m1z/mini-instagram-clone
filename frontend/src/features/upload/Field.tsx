@@ -16,7 +16,7 @@ export function Field({
   children,
 }: Props) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <FieldLabel id={id}> {label} </FieldLabel>
       {children}
       <FieldError hint={hint} error={error} name={name} />
@@ -32,7 +32,7 @@ export function FieldLabel({
   children: React.ReactNode;
 }) {
   return (
-    <label htmlFor={id} className="text-sm font-medium text-slate-800">
+    <label htmlFor={id} className="text-sm font-semibold text-slate-700">
       {children}
     </label>
   );
