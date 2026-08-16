@@ -1,25 +1,18 @@
 package service
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"image"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 	"io"
-	"net/http"
 	"strings"
 	"time"
 	"unicode/utf8"
 
 	"github.com/4m1z/mini-instagram-clone/backend/internal/domain"
-	_ "golang.org/x/image/webp"
 )
 
 const (
@@ -29,13 +22,6 @@ const (
 )
 
 var ErrFileTooLarge = errors.New("file too large")
-
-var allowedMimeExt = map[string]string{
-	"image/jpeg": ".jpg",
-	"image/png":  ".png",
-	"image/gif":  ".gif",
-	"image/webp": ".webp",
-}
 
 type ImageRepository interface {
 	Create(ctx context.Context, img domain.Image) error
@@ -60,14 +46,21 @@ type UploadImageInput struct {
 }
 
 type ImageService struct {
-	repo      ImageRepository
-	files     FileStore
-	publisher ImagePublisher
-	now       func() time.Time
+	repo               ImageRepository
+	files              FileStore
+	publisher          ImagePublisher
+	normalizationSlots chan struct{}
+	now                func() time.Time
 }
 
 func NewImageService(repo ImageRepository, files FileStore, publisher ImagePublisher) *ImageService {
-	return &ImageService{repo: repo, files: files, publisher: publisher, now: time.Now}
+	return &ImageService{
+		repo:               repo,
+		files:              files,
+		publisher:          publisher,
+		normalizationSlots: make(chan struct{}, maxConcurrentNormalizations),
+		now:                time.Now,
+	}
 }
 
 func (s *ImageService) Feed(ctx context.Context, tag string) ([]domain.Image, error) {
@@ -94,9 +87,24 @@ func (s *ImageService) Upload(ctx context.Context, in UploadImageInput) (domain.
 	if in.Size > MaxFileSizeBytes {
 		return domain.Image{}, ErrFileTooLarge
 	}
+	if err := ctx.Err(); err != nil {
+		return domain.Image{}, err
+	}
 
-	body, mimeType, err := detectFileType(in.File)
+	select {
+	case s.normalizationSlots <- struct{}{}:
+	case <-ctx.Done():
+		return domain.Image{}, ctx.Err()
+	}
+
+	body, err := func() ([]byte, error) {
+		defer func() { <-s.normalizationSlots }()
+		return normalizeImage(in.File)
+	}()
 	if err != nil {
+		return domain.Image{}, err
+	}
+	if err := ctx.Err(); err != nil {
 		return domain.Image{}, err
 	}
 
@@ -109,13 +117,13 @@ func (s *ImageService) Upload(ctx context.Context, in UploadImageInput) (domain.
 		ID:        id,
 		Title:     title,
 		Tag:       tag,
-		Filename:  id + allowedMimeExt[mimeType],
-		MimeType:  mimeType,
-		SizeBytes: in.Size,
+		Filename:  id + normalizedExtension,
+		MimeType:  normalizedMimeType,
+		SizeBytes: int64(len(body)),
 		CreatedAt: s.now().UTC(),
 	}
 
-	if err := s.files.Save(img.Filename, body); err != nil {
+	if err := s.files.Save(img.Filename, bytes.NewReader(body)); err != nil {
 		return domain.Image{}, fmt.Errorf("store file: %w", err)
 	}
 	if err := s.repo.Create(ctx, img); err != nil {
@@ -150,31 +158,6 @@ func validateTag(v *domain.ValidationError, tag string) {
 	case utf8.RuneCountInString(tag) > MaxTagLength:
 		v.Add("tag", fmt.Sprintf("must be at most %d characters", MaxTagLength))
 	}
-}
-
-func detectFileType(r io.Reader) (io.Reader, string, error) {
-	reader := bufio.NewReader(r)
-	head, err := reader.Peek(512)
-	if err != nil && !errors.Is(err, io.EOF) {
-		return nil, "", fmt.Errorf("read upload: %w", err)
-	}
-
-	mimeType, _, _ := strings.Cut(http.DetectContentType(head), ";")
-	if _, ok := allowedMimeExt[mimeType]; !ok {
-		return nil, "", invalidImageError()
-	}
-
-	var consumed bytes.Buffer
-	if _, _, err := image.DecodeConfig(io.TeeReader(reader, &consumed)); err != nil {
-		return nil, "", invalidImageError()
-	}
-	return io.MultiReader(bytes.NewReader(consumed.Bytes()), reader), mimeType, nil
-}
-
-func invalidImageError() error {
-	v := &domain.ValidationError{}
-	v.Add("image", "unsupported or invalid image, allowed: JPEG, PNG, GIF, WEBP")
-	return v
 }
 
 func newID() (string, error) {

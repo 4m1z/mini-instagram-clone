@@ -16,6 +16,8 @@ import (
 // multipart envelope and the text fields.
 const maxRequestBody = service.MaxFileSizeBytes + (1 << 20)
 
+const maxConcurrentUploads = 1
+
 // ImageUseCases is the slice of the service layer this handler needs.
 type ImageUseCases interface {
 	Feed(ctx context.Context, tag string) ([]domain.Image, error)
@@ -25,13 +27,19 @@ type ImageUseCases interface {
 
 // ImageHandler is a thin HTTP adapter around ImageUseCases.
 type ImageHandler struct {
-	images ImageUseCases
-	mapper ImageMapper
-	log    *slog.Logger
+	images  ImageUseCases
+	mapper  ImageMapper
+	log     *slog.Logger
+	uploads chan struct{}
 }
 
 func NewImageHandler(images ImageUseCases, mapper ImageMapper, log *slog.Logger) *ImageHandler {
-	return &ImageHandler{images: images, mapper: mapper, log: log}
+	return &ImageHandler{
+		images:  images,
+		mapper:  mapper,
+		log:     log,
+		uploads: make(chan struct{}, maxConcurrentUploads),
+	}
 }
 
 // GET /api/images[?tag=]
@@ -61,6 +69,14 @@ func (h *ImageHandler) Tags(c *gin.Context) {
 func (h *ImageHandler) Upload(c *gin.Context) {
 	if c.ContentType() != "multipart/form-data" {
 		c.JSON(http.StatusUnsupportedMediaType, errorResponse{Error: errorBody{Code: codeUnsupported, Message: "Expected a multipart/form-data request.", Fields: nil}})
+		return
+	}
+	select {
+	case h.uploads <- struct{}{}:
+		defer func() { <-h.uploads }()
+	default:
+		c.Header("Retry-After", "1")
+		c.JSON(http.StatusServiceUnavailable, errorResponse{Error: errorBody{Code: codeBusy, Message: "Another image is being processed. Please retry shortly.", Fields: nil}})
 		return
 	}
 

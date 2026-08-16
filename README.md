@@ -46,7 +46,7 @@ docker compose down
 ### Backend & Infrastructure
 
 - I use Gin for HTTP handlers, and the WebSocket hub manages live clients.
-- The image service validates the fields and real image content before saving anything.
+- The image service decodes and validates uploads, limits decoded dimensions, and normalizes images to bounded, metadata-free JPEGs before saving anything.
 - I save image metadata in SQLite and image files on the filesystem.
 - I broadcast a new image only after its file and metadata are saved successfully.
 - In development, Vite and Air give us frontend and backend hot reload.

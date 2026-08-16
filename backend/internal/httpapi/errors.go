@@ -16,6 +16,7 @@ const (
 	codeNotFound    = "not_found"
 	codeBadRequest  = "bad_request"
 	codeUnsupported = "unsupported_media_type"
+	codeBusy        = "service_busy"
 	codeInternal    = "internal_error"
 )
 

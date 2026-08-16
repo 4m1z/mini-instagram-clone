@@ -39,9 +39,10 @@ Accepts `multipart/form-data` with these fields:
 
 - `title`: required, max: 120 chars 
 - `tag`: required, max 32 chars
-- `image`: one JPEG, PNG, GIF, or WEBP file, max 10 MB
+- `image`: one JPEG, PNG, GIF, or static WEBP file, max 10 MB
 
 Tags are trimmed, lowercased, and stored without a leading `#`.
+Images may contain at most 25 megapixels. Recognized JPEG EXIF orientation is applied, then images are resized to fit within 1600 x 1600 pixels, flattened onto white, stripped of metadata, and encoded as JPEG at quality 85. Animated GIFs are stored as a still image.
 
 A successful upload returns `201`:
 
@@ -55,7 +56,7 @@ A successful upload returns `201`:
 }
 ```
 
-Common errors are `413` for an oversized upload, `415` for the wrong request media type, `422` for invalid fields or image content, and `500` for an internal failure.
+Common errors are `413` for an oversized upload, `415` for the wrong request media type, `422` for invalid fields or image content, `503` when another upload is being processed, and `500` for an internal failure.
 
 ### `GET /files/{filename}`
 

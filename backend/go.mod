@@ -3,6 +3,7 @@ module github.com/4m1z/mini-instagram-clone/backend
 go 1.25.1
 
 require (
+	github.com/disintegration/imaging v1.6.2
 	github.com/gin-gonic/gin v1.11.0
 	github.com/gorilla/websocket v1.5.3
 	golang.org/x/image v0.45.0

@@ -66,7 +66,7 @@ export function UploadForm({ onViewFeed }: Props) {
           id="image"
           name="image"
           label="Image"
-          hint="JPEG, PNG, GIF or WEBP, up to 10 MB."
+          hint="JPEG, PNG, GIF or static WEBP, up to 10 MB. Images are optimized after upload."
           error={fields.image}
         >
           <Input
