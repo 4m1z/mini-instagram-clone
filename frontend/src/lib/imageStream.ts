@@ -19,11 +19,7 @@ const statusListeners = new Set<() => void>();
 const imageListeners = new Set<ImageListener>();
 const reconnectListeners = new Set<() => void>();
 
-/**
- * A single application wide WebSocket connection. It is opened while at least
- * one subscriber is interested and reconnects with backoff. Kept outside React
- * so that connection handling does not cause renders on its own.
- */
+// Shared WebSocket that reconnects while subscribers are active. 
 export function subscribeToImages(listener: ImageListener): () => void {
   imageListeners.add(listener);
   requestConnection();
@@ -46,7 +42,7 @@ export function subscribeToStatus(listener: () => void): () => void {
   return () => statusListeners.delete(listener);
 }
 
-/** Notifies server-state owners that events may have been missed while offline. */
+// Notifies server-state owners that events may have been missed while offline. 
 export function subscribeToReconnect(listener: () => void): () => void {
   reconnectListeners.add(listener);
   return () => reconnectListeners.delete(listener);

@@ -1,12 +1,12 @@
-# Mini Instagram Clone
+## Mini Instagram Clone
 
 A small anonymous image-sharing app built with React 19, Go, SQLite, local file storage, REST, and WebSockets.
 
-## Running
+### Running
 
 Prerequisite: Docker 
 
-### Development
+#### Development
 
 ```bash
 docker compose -f docker-compose.dev.yml up --build
@@ -18,7 +18,7 @@ docker compose -f docker-compose.dev.yml up --build
 
 Development data is stored on the host under `backend/data/` and ignored by Git.
 
-### Production
+#### Production
 ```bash
 docker compose up --build -d
 ```
@@ -41,9 +41,11 @@ docker compose down
    It does not delete development data from `backend/data/`.
 </details>
 
-## Architecture
+----
 
-### Backend & Infrastructure
+### Architecture
+
+#### Backend & Infrastructure
 
 - I use Gin for HTTP handlers, and the WebSocket hub manages live clients.
 - The image service decodes and validates uploads, limits decoded dimensions, and normalizes images to bounded, metadata-free JPEGs before saving anything.
@@ -52,7 +54,7 @@ docker compose down
 - In development, Vite and Air give us frontend and backend hot reload.
 - In production, Bun/Vite builds the frontend, and nginx serves it and proxies API, file, and WebSocket traffic to Go.
 
-### Frontend
+#### Frontend
 
 - I use React 19 form actions for image uploads and field errors.
 - I use TanStack Query for server data and cache updates after uploads or live events.
@@ -60,9 +62,9 @@ docker compose down
 - I map API DTOs to frontend types before components use them.
 - I use one WebSocket connection for live updates, and it reconnects automatically.
 
+----
 
-
-## Documentation
+### Documentation
 
 See the [API reference](docs/API.md) 
 

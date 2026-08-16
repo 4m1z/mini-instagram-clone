@@ -1,5 +1,5 @@
 /**
- * Wire format of the backend. These types exist only inside src/api and are
+ * These types exist only inside src/api and are
  * translated into domain models by the mappers.
  */
 export type ImageDTO = {

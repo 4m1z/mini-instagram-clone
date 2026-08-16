@@ -28,7 +28,6 @@ func NewHub(log *slog.Logger) *Hub {
 	return &Hub{clients: make(map[*client]struct{}), log: log}
 }
 
-// Broadcast marshals the event once and delivers it to every client.
 func (h *Hub) Broadcast(event Event) {
 	data, err := json.Marshal(event)
 	if err != nil {
@@ -49,13 +48,6 @@ func (h *Hub) Broadcast(event Event) {
 			delete(h.clients, c)
 		}
 	}
-}
-
-// ClientCount is used by the health endpoint and tests.
-func (h *Hub) ClientCount() int {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
-	return len(h.clients)
 }
 
 func (h *Hub) add() *client {
