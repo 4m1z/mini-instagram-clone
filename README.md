@@ -11,37 +11,25 @@ Prerequisite: Docker
 ```bash
 docker compose -f docker-compose.dev.yml up --build
 ```
-- Frontend: http://localhost:3000
+- App : http://localhost:3000
 - Backend: http://localhost:8080
+
+<details> <summary> db & uploaded files files </summary> 
 - SQLite: `backend/data/app.db`
 - Uploads: `backend/data/uploads/`
+</details>
 
-Development data is stored on the host under `backend/data/` and ignored by Git.
 
 #### Production
 ```bash
 docker compose up --build -d
 ```
 
-- Application: http://localhost:8000
+- app: http://localhost:8000
 - Backend: http://localhost:8080
-
-Production data is stored in the `backend-data` Docker volume. It survives container restarts, rebuilds, and normal `docker compose down`/`up` cycles.
-
-Stop either environment with:
-
-```bash
-docker compose -f docker-compose.dev.yml down
-docker compose down
-```
-
-<details> 
-  <summary> prod uploads will be stored in docker volume </summary> 
-   Running `docker compose down -v` deletes the production data volume. 
-   It does not delete development data from `backend/data/`.
+<details><summary>production data</summary> Production data is stored in the `backend-data` Docker volume. It survives container restarts, rebuilds, and normal `docker compose down`/`up` cycles.
 </details>
 
-----
 
 ### Architecture
 
@@ -62,7 +50,13 @@ docker compose down
 - I map API DTOs to frontend types before components use them.
 - I use one WebSocket connection for live updates, and it reconnects automatically.
 
-----
+
+### Bonus Features
+- I added Docker for development and production.
+- I use TanStack Query caching for the feed and tags.
+- I normalize uploaded images before saving them.
+- I spent some extra time on a responsive and polished UI.
+
 
 ### Documentation
 
