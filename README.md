@@ -2,13 +2,6 @@
 
 A small anonymous image-sharing app built with React 19, Go, SQLite, local file storage, REST, and WebSockets.
 
-## Features
-
-- Upload JPEG, PNG, GIF, and WEBP images with a title and tag.
-- Browse and filter the feed by tag.
-- Receive new images live through a reconnecting WebSocket.
-- Persist image metadata in SQLite and files on disk.
-
 ## Running
 
 Prerequisite: Docker 
@@ -18,7 +11,6 @@ Prerequisite: Docker
 ```bash
 docker compose -f docker-compose.dev.yml up --build
 ```
-
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8080
 - SQLite: `backend/data/app.db`
@@ -27,7 +19,6 @@ docker compose -f docker-compose.dev.yml up --build
 Development data is stored on the host under `backend/data/` and ignored by Git.
 
 ### Production
-
 ```bash
 docker compose up --build -d
 ```
