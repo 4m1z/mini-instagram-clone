@@ -46,18 +46,16 @@ type UploadImageInput struct {
 }
 
 type ImageService struct {
-	repo               ImageRepository
-	files              FileStore
-	publisher          ImagePublisher
-	now                func() time.Time
+	repo      ImageRepository
+	files     FileStore
+	publisher ImagePublisher
 }
 
 func NewImageService(repo ImageRepository, files FileStore, publisher ImagePublisher) *ImageService {
 	return &ImageService{
-		repo:               repo,
-		files:              files,
-		publisher:          publisher,
-		now:                time.Now,
+		repo:      repo,
+		files:     files,
+		publisher: publisher,
 	}
 }
 
@@ -109,7 +107,7 @@ func (s *ImageService) Upload(ctx context.Context, in UploadImageInput) (domain.
 		Filename:  id + normalizedExtension,
 		MimeType:  normalizedMimeType,
 		SizeBytes: int64(len(body)),
-		CreatedAt: s.now().UTC(),
+		CreatedAt: time.Now().UTC(),
 	}
 
 	if err := s.files.Save(img.Filename, bytes.NewReader(body)); err != nil {

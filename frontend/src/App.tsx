@@ -6,7 +6,7 @@ import { UploadForm } from "./features/upload";
 import { setUrlParam, useUrlParam } from "./lib/urlState";
 
 export function App() {
-  useLiveFeed();
+  const streamStatus = useLiveFeed();
 
   const tab: Tab = useUrlParam("tab") === "upload" ? "upload" : "feed";
   const selectedTag = normalizeTag(useUrlParam("tag"));
@@ -25,7 +25,7 @@ export function App() {
           </span>
           <h1 className="text-xl font-bold tracking-tight text-slate-950">Mini Instagram</h1>
         </div>
-        <LiveIndicator />
+        <LiveIndicator status={streamStatus} />
       </header>
 
       <TabNav active={tab} onChange={(next) => setUrlParam("tab", next === "feed" ? null : next)} />
