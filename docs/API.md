@@ -1,80 +1,64 @@
+"GET /api/health"
 
-### `GET /api/health`
+Checks if the backend is running.
 
-Returns `200` when the backend is running:
-
-```json
 {"status":"ok"}
-```
 
-### `GET /api/images`
+"GET /api/images"
 
-Returns images newest first. Pass an optional exact tag filter, for example `/api/images?tag=nature`.
+Returns uploaded images, newest first. Optional: "?tag=nature"
 
-```json
 {
   "images": [
     {
       "id": "...",
-      "title": "Sunset",
-      "tag": "nature",
-      "imageUrl": "/files/image-id.jpg",
-      "createdAt": "2026-08-15T12:00:00Z"
+      "title": "...",
+      "tag": "...",
+      "imageUrl": "...",
+      "createdAt": "..."
     }
   ]
 }
-```
 
-### `GET /api/tags`
+"GET /api/tags"
 
-Returns distinct tags in alphabetical order:
+Returns all available tags.
 
-```json
 {"tags":["city","nature"]}
-```
 
-### `POST /api/uploads`
+"POST /api/uploads"
 
-Accepts `multipart/form-data` with these fields:
+Uploads a new image.
 
-- `title`: required, max: 120 chars 
-- `tag`: required, max 32 chars
-- `image`: one JPEG, PNG, GIF, or static WEBP file, max 10 MB
+"multipart/form-data"
 
-Tags are trimmed, lowercased, and stored without a leading `#`.
-Images may contain at most 25 megapixels. Recognized JPEG EXIF orientation is applied, then images are resized to fit within 1600 x 1600 pixels, flattened onto white, stripped of metadata, and encoded as JPEG at quality 85. Animated GIFs are stored as a still image.
+- "title" — max 120
+- "tag" — max 32
+- "image" — JPEG, PNG, GIF, WEBP, max 10 MB
 
-A successful upload returns `201`:
-
-```json
 {
   "id": "...",
-  "title": "Sunset",
-  "tag": "nature",
-  "imageUrl": "/files/image-id.jpg",
-  "createdAt": "2026-08-15T12:00:00Z"
+  "title": "...",
+  "tag": "...",
+  "imageUrl": "...",
+  "createdAt": "..."
 }
-```
 
-Common errors are `413` for an oversized upload, `415` for the wrong request media type, `422` for invalid fields or image content, `503` when another upload is being processed, and `500` for an internal failure.
+"GET /files/{filename}"
 
-### `GET /files/{filename}`
+Returns a stored image, or "404" if not found.
 
-Returns the stored image with `200`, or `404` when it does not exist.
+"GET /api/ws"
 
-### `GET /api/ws`
+WebSocket endpoint for new image events.
 
-Upgrades to a WebSocket connection. Each persisted upload broadcasts:
-
-```json
 {
   "type": "image.created",
   "payload": {
     "id": "...",
-    "title": "Sunset",
-    "tag": "nature",
-    "imageUrl": "/files/image-id.jpg",
-    "createdAt": "2026-08-15T12:00:00Z"
+    "title": "...",
+    "tag": "...",
+    "imageUrl": "...",
+    "createdAt": "..."
   }
 }
-```
