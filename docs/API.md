@@ -1,13 +1,16 @@
-"GET /api/health"
+### `GET /api/health`
 
 Checks if the backend is running.
 
+```json
 {"status":"ok"}
+```
 
-"GET /api/images"
+### `GET /api/images`
 
-Returns uploaded images, newest first. Optional: "?tag=nature"
+Returns uploaded images, newest first. Optional: `?tag=nature`
 
+```json
 {
   "images": [
     {
@@ -19,23 +22,27 @@ Returns uploaded images, newest first. Optional: "?tag=nature"
     }
   ]
 }
+```
 
-"GET /api/tags"
+### `GET /api/tags`
 
 Returns all available tags.
 
+```json
 {"tags":["city","nature"]}
+```
 
-"POST /api/uploads"
+### `POST /api/uploads`
 
 Uploads a new image.
 
-"multipart/form-data"
+`multipart/form-data`
 
-- "title" — max 120
-- "tag" — max 32
-- "image" — JPEG, PNG, GIF, WEBP, max 10 MB
+- `title` — max 120
+- `tag` — max 32
+- `image` — JPEG, PNG, GIF, WEBP, max 10 MB
 
+```json
 {
   "id": "...",
   "title": "...",
@@ -43,15 +50,17 @@ Uploads a new image.
   "imageUrl": "...",
   "createdAt": "..."
 }
+```
 
-"GET /files/{filename}"
+### `GET /files/{filename}`
 
-Returns a stored image, or "404" if not found.
+Returns a stored image, or `404` if not found.
 
-"GET /api/ws"
+### `GET /api/ws`
 
 WebSocket endpoint for new image events.
 
+```json
 {
   "type": "image.created",
   "payload": {
@@ -62,3 +71,4 @@ WebSocket endpoint for new image events.
     "createdAt": "..."
   }
 }
+```
