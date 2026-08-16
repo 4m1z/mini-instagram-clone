@@ -38,7 +38,11 @@ func NewRouter(d RouterDeps) http.Handler {
 	files := http.StripPrefix(filesPath, http.FileServer(http.Dir(d.FilesDir)))
 	serveFile := func(c *gin.Context) {
 		if c.Param("filepath") == "/" {
-			c.JSON(http.StatusNotFound, errorResponse{Error: errorBody{Code: codeNotFound, Message: "The requested resource was not found.", Fields: nil}})
+			c.JSON(http.StatusNotFound, errorResponse{Error: errorBody{
+				Code:    codeNotFound,
+				Message: "The requested resource was not found.",
+				Fields:  nil,
+			}})
 			return
 		}
 		files.ServeHTTP(c.Writer, c.Request)
@@ -47,10 +51,20 @@ func NewRouter(d RouterDeps) http.Handler {
 	router.HEAD(filesPath+"/*filepath", serveFile)
 
 	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, errorResponse{Error: errorBody{Code: codeNotFound, Message: "The requested resource was not found.", Fields: nil}})
+		c.JSON(http.StatusNotFound, errorResponse{
+			Error: errorBody{
+				Code:    codeNotFound,
+				Message: "The requested resource was not found.",
+				Fields:  nil,
+			},
+		})
 	})
 	router.NoMethod(func(c *gin.Context) {
-		c.JSON(http.StatusMethodNotAllowed, errorResponse{Error: errorBody{Code: codeBadRequest, Message: "The request method is not allowed.", Fields: nil}})
+		c.JSON(http.StatusMethodNotAllowed, errorResponse{Error: errorBody{
+			Code:    codeBadRequest,
+			Message: "The request method is not allowed.",
+			Fields:  nil,
+		}})
 	})
 
 	// Gin's multipart setting controls memory usage, not total request size.
