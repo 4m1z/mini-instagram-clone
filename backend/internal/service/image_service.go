@@ -49,7 +49,6 @@ type ImageService struct {
 	repo               ImageRepository
 	files              FileStore
 	publisher          ImagePublisher
-	normalizationSlots chan struct{}
 	now                func() time.Time
 }
 
@@ -58,7 +57,6 @@ func NewImageService(repo ImageRepository, files FileStore, publisher ImagePubli
 		repo:               repo,
 		files:              files,
 		publisher:          publisher,
-		normalizationSlots: make(chan struct{}, maxConcurrentNormalizations),
 		now:                time.Now,
 	}
 }
@@ -91,16 +89,7 @@ func (s *ImageService) Upload(ctx context.Context, in UploadImageInput) (domain.
 		return domain.Image{}, err
 	}
 
-	select {
-	case s.normalizationSlots <- struct{}{}:
-	case <-ctx.Done():
-		return domain.Image{}, ctx.Err()
-	}
-
-	body, err := func() ([]byte, error) {
-		defer func() { <-s.normalizationSlots }()
-		return normalizeImage(in.File)
-	}()
+	body, err := normalizeImage(in.File)
 	if err != nil {
 		return domain.Image{}, err
 	}

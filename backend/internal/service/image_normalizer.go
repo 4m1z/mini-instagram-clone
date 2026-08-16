@@ -21,7 +21,6 @@ import (
 
 const (
 	maxSourcePixels             = 25_000_000
-	maxConcurrentNormalizations = 1
 	normalizedMaxDimension      = 1600
 	normalizedJPEGQuality       = 85
 	normalizedMimeType          = "image/jpeg"
